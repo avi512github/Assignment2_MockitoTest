@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class EmployeeControllerTest {
 		.andExpect(jsonPath("$[1].firstName", is("Eberhardt")))
         .andExpect(jsonPath("$[1].lastName", is("Terkki")));
 		
-		//Dateformat is creating issue here, so commenting for now. Running Fine without BirthDate & hireDate Parameter
+		//Dateformat of BithDate & hireDate are creating issue, so leaving it for now. Running Fine without BirthDate & hireDate Parameter
 		
 		verify(service, times(1)).getAllEmployeesNameAndDobByDepartmentId(anyString());
 		
@@ -88,12 +89,12 @@ public class EmployeeControllerTest {
 		mockMvc.perform(get("/employee/hiredate/1990-01-01/salary/80000"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$", hasSize(3)))
+		.andExpect(jsonPath("$", Matchers.hasSize(3)))
 		.andExpect(jsonPath("$[1].firstName", is("Patricio")))
         .andExpect(jsonPath("$[1].lastName", is("Bridgland")))
         .andExpect(jsonPath("$[1].employeeNo", is(10012)));
-		
-		//Dateformat is creating issue here, so commenting for now. Running Fine without BirthDate & hireDate Parameter
+
+		//Dateformat of BithDate & hireDate are creating issue, so leaving it for now. Running Fine without BirthDate & hireDate Parameter
 		
 
 		verify(service, times(1)).getAllEmployeesNamesHiredAfterDateAndMinSalaryIs(anyString(), anyInt());
