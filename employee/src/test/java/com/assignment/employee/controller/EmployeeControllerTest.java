@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.eq;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +20,7 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,13 +54,15 @@ public class EmployeeControllerTest {
 		employees.add(employee1);
 		employees.add(employee2);
 		
-		when(service.getAllEmployeesNameAndDobByDepartmentId(anyString())).thenReturn(employees);
+		Mockito.when(service.getAllEmployeesNameAndDobByDepartmentId("d003")).thenReturn(employees);
 		
 		mockMvc.perform(get("/employee/department/d003"))
 		.andExpect(status().isOk())
+		.andExpect(jsonPath("$", Matchers.hasSize(2)))
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$[1].firstName", is("Eberhardt")))
-        .andExpect(jsonPath("$[1].lastName", is("Terkki")));
+        .andExpect(jsonPath("$[1].lastName", is("Terkki")))
+		.andExpect(jsonPath("$[1].birthDate", is("1962-12-29T18:30:00.000+0000")));
 		
 		//Dateformat of BithDate & hireDate are creating issue, so leaving it for now. Running Fine without BirthDate & hireDate Parameter
 		
@@ -75,7 +77,7 @@ public class EmployeeControllerTest {
 
 		Employee employee1 = new Employee(10011, FORMAT.parse("1953-11-07"), "Mary", "Sluis", FORMAT.parse("1990-01-22"));
 		Employee employee2 = new Employee(10012, FORMAT.parse("1960-10-04"), "Patricio", "Bridgland", FORMAT.parse("1992-12-18"));
-		Employee employee3 = new Employee(10017, FORMAT.parse("1958-07-06"), "Cristinel", "Bouloucos", FORMAT.parse("1993-08-03"));
+		Employee employee3 = new Employee(10017, FORMAT.parse("1956-12-29"), "Cristinel", "Bouloucos", FORMAT.parse("1991-12-28"));
 
 		Integer minSalary = 80000;
 		String date = "1990-01-01";
@@ -84,7 +86,7 @@ public class EmployeeControllerTest {
 		employees.add(employee2);
 		employees.add(employee3);
 
-		when(service.getAllEmployeesNamesHiredAfterDateAndMinSalaryIs(eq(date), eq(minSalary))).thenReturn(employees);
+		when(service.getAllEmployeesNamesHiredAfterDateAndMinSalaryIs(date, minSalary)).thenReturn(employees);
 		
 		mockMvc.perform(get("/employee/hiredate/1990-01-01/salary/80000"))
 		.andExpect(status().isOk())
@@ -93,7 +95,8 @@ public class EmployeeControllerTest {
 		.andExpect(jsonPath("$[1].firstName", is("Patricio")))
         .andExpect(jsonPath("$[1].lastName", is("Bridgland")))
         .andExpect(jsonPath("$[1].employeeNo", is(10012)));
-
+		
+		
 		//Dateformat of BithDate & hireDate are creating issue, so leaving it for now. Running Fine without BirthDate & hireDate Parameter
 		
 

@@ -12,24 +12,24 @@ import com.assignment.employee.model.Employee;
 public class JdbcEmployeeRepository implements EmployeeRepository{
 
 	
-	 @Autowired
-	 private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	 
-	 private static final String DATE_FORMAT = "YYYY-MM-DD";
-
 
 	@Override
 	public List<Employee> getAllEmployeesNameAndDobByDepartmentId(String departmentId) {
 		
 		return jdbcTemplate.query(
-                "select emp.first_name, emp.last_name, emp.birth_date from employees emp, dept_emp dep  where emp.emp_no=dep.emp_no and dep.dept_no=?",
+                "select emp.emp_no, emp.first_name, emp.last_name, emp.birth_date, emp.hire_date  from employees emp, dept_emp dep  where emp.emp_no=dep.emp_no and dep.dept_no=?",
                 new Object[]{departmentId},
                 (rs, rowNum) ->
-                        new Employee(
-                                rs.getString("first_name"),
-                                rs.getString("last_name"),
-                                rs.getTimestamp("birth_date")
-                        )
+                new Employee(
+                		rs.getInt("emp_no"),
+                		rs.getTimestamp("birth_date"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getTimestamp("hire_date")
+                )
         );
 	}
 
